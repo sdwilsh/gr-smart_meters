@@ -92,15 +92,16 @@ namespace gr {
 		// uint16_t crc = 0x45F8;	// (CoServ CRC)
 		// uint16_t crc = 0x5FD6;	// (Oncor CRC)
 		// uint16_t crc = 0x62C1;	// (Hydro-Quebec CRC)
-		// Hard coded Poly 0x1021
-	    uint16_t i = 6; 			// Skip over header/packet length [00,FF,2A,55,xx,xx]
+	    const uint16_t crc_poly = 0x1021;
+	    uint16_t xorout = 0x00;		// Future use
+	    uint16_t i = 4; 			// Skip over header/packet length [2A,55,xx,xx]
 	    while (size--) {       
 			crc ^= data[i] << 8;
 			i++;
 			for (unsigned k = 0; k < 8; k++)
-				crc = crc & 0x8000 ? (crc << 1) ^ 0x1021 : crc << 1;     
+				crc = crc & 0x8000 ? (crc << 1) ^ crc_poly : crc << 1;     
 	    }     
-		return crc; 
+		return crc ^ xorout; 
     } 
 
     void
@@ -108,7 +109,7 @@ namespace gr {
     {
 		pmt::pmt_t meta = pmt::car(pdu);
 		pmt::pmt_t v_data = pmt::cdr(pdu);
-
+		std::cout << "Entered Block\n";
 		// make sure PDU data is formed properly
 		if (!(pmt::is_pair(pdu))) {
 			GR_LOG_WARN(d_logger, "received unexpected PMT (non-pair)");
@@ -129,10 +130,21 @@ namespace gr {
 		// Packet not large enough, probably noise
 		if (data.size() < 9)
 			return;				
-		// Read header and packet length
+		// Read 10/11 bits for Gridstream 4/5 designator
+		// Gridstream 4 = 0111111111
+		// Gridstream 5 = 11111111111
+		long offset = 0;
+		if (data[0]) {
+			offset = 11;
+			std::cout << "G5\n";
+		}
+		else {
+			offset = 10;
+			std::cout << "G4\n";
+		}
+		// Read header and packet length [2A,55,xx,xx]
 		uint8_t byte = 0;
-		long offset = 1;
-		for (int ii=0; ii<4+2; ii++) {
+		for (int ii=0; ii<4; ii++) {
 			for (int jj = 0; jj < 8; jj++) {
 				// START MSB FIRST PROCESSING
 				byte >>= 1;
@@ -146,8 +158,8 @@ namespace gr {
 			offset += 10;
 		}
 		// Packet decoded 00,FF,2A,packet_type(xx),packet_len(xxxx)
-	    int packet_type = out[3];
-	    int packet_len = out[5] | out[4] << 8;
+	    int packet_type = out[1];
+	    int packet_len = out[3] | out[2] << 8;
 	    
 	    // Loop to decode data based on packet_len
 	    if (data.size() > packet_len) {
@@ -175,19 +187,19 @@ namespace gr {
 		
 		if (packet_type == 0x55 && packet_len == 0x0023)
 		{
-			meterID = out[27+2] | out[26+2] << 8 | out[25+2] << 16 | out[24+2] << 24;
-			upTime = out[21+2] | out[20+2] << 8 | out[19+2] << 16 | out[18+2] << 24;
+			meterID = out[27] | out[26] << 8 | out[25] << 16 | out[24] << 24;
+			upTime = out[21] | out[20] << 8 | out[19] << 16 | out[18] << 24;
 		} else if (packet_type == 0xD5)
 		{
-			meterID2 = out[8+2] | out[7+2] << 8 | out[6+2] << 16 | out[5+2] << 24;
-			meterID = out[12+2] | out[11+2] << 8 | out[10+2] << 16 | out[9+2] << 24;
+			meterID2 = out[8] | out[7] << 8 | out[6] << 16 | out[5] << 24;
+			meterID = out[12] | out[11] << 8 | out[10] << 16 | out[9] << 24;
 		} else
 		{
 			return;
 		}
 
-		int receivedCRC = out[packet_len+5] | out[packet_len+4] << 8;
-		uint16_t calculatedCRC = GridStream_impl::crc16(d_crcInitialValue, out, out.size()-8); //Strip off header/len (6) and crc (2)
+		int receivedCRC = out[packet_len+3] | out[packet_len+2] << 8;
+		uint16_t calculatedCRC = GridStream_impl::crc16(d_crcInitialValue, out, out.size()-6); //Strip off header/len (4) and crc (2)
 
 	if( ((receivedCRC == calculatedCRC) || !(d_crcEnable)) && 
 	    ((meterID == d_meterMonitorID) || (meterID2 == d_meterMonitorID) || (d_meterMonitorID == 0)) &&
@@ -199,7 +211,9 @@ namespace gr {
 			{
 				std::cout << std::setw(2) << int(out[i]);
 			}
-			std::cout << "\n";
+			std::time_t result = std::time(nullptr);
+			std::cout << "\t\t" << std::ctime(&result);
+			//std::cout << "\n";
 
 			message_port_pub(PMTCONSTSTR__PDU_OUT,(pmt::cons(meta, pmt::init_u8vector(out.size(), out))));
 			return;

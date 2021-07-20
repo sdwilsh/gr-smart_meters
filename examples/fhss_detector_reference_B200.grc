@@ -103,7 +103,7 @@ blocks:
   id: variable
   parameters:
     comment: "UPDATE ME! \nChange the syncwords to match bursts of interest"
-    value: '''10101010101010101010101010101010101010101010101010'''
+    value: '''01010101010101010101010101010101010101010100000000001'''
   states:
     bus_sink: false
     bus_source: false
@@ -175,6 +175,19 @@ blocks:
     coordinate: [1440, 440.0]
     rotation: 0
     state: disabled
+- name: blocks_message_debug_0_1_1
+  id: blocks_message_debug
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [968, 1688.0]
+    rotation: 0
+    state: disabled
 - name: blocks_probe_rate_0
   id: blocks_probe_rate
   parameters:
@@ -217,7 +230,7 @@ blocks:
     bus_structure: null
     coordinate: [984, 1588.0]
     rotation: 0
-    state: true
+    state: disabled
 - name: burst_width
   id: parameter
   parameters:
@@ -431,7 +444,7 @@ blocks:
     label: Max Burst Time [s]
     short_id: ''
     type: eng_float
-    value: '0.5'
+    value: '0.8'
   states:
     bus_sink: false
     bus_source: false
@@ -1114,7 +1127,7 @@ blocks:
     label: Sample Rate
     short_id: r
     type: intx
-    value: int(26e6)
+    value: int(28e6)
   states:
     bus_sink: false
     bus_source: false
@@ -1494,6 +1507,7 @@ blocks:
     sd_spec6: ''
     sd_spec7: ''
     show_lo_controls: 'False'
+    start_time: '-1.0'
     stream_args: ''
     stream_chans: '[]'
     sync: sync
@@ -1610,6 +1624,7 @@ connections:
 - [fhss_utils_cf_estimate_0, out, pdu_utils_pdu_fir_filter_1, pdu_in]
 - [fhss_utils_fft_burst_tagger_0, '0', fhss_utils_tagged_burst_to_pdu_0, '0']
 - [fhss_utils_tagged_burst_to_pdu_0, cpdus, fhss_utils_cf_estimate_0, in]
+- [pdu_utils_pdu_align_0, pdu_out, blocks_message_debug_0_1_1, print_pdu]
 - [pdu_utils_pdu_align_0, pdu_out, smart_meters_GridStream_0, pdu_in]
 - [pdu_utils_pdu_clock_recovery_0, pdu_out, pdu_utils_pdu_split_0_0, pdu_in]
 - [pdu_utils_pdu_clock_recovery_0, pdu_out, qtgui_time_sink_x_0_0_0_0_0_0_0_0, in]

@@ -4,7 +4,7 @@
 # Dumps data to console, copy and paste to a file and save as .csv
 #
 import socket, select, string, sys, binascii, struct, time
-import numpy as np
+#import numpy as np
 
 def decodeGPS(encodedData):
 	latMultiplier = (float(2**20)/90)
