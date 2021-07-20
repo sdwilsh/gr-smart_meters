@@ -103,7 +103,7 @@ blocks:
   id: variable
   parameters:
     comment: "UPDATE ME! \nChange the syncwords to match bursts of interest"
-    value: '''01010101010101010101010101010101010101010100000000001'''
+    value: '''10101010101010101010101010101010101010101010100000000001'''
   states:
     bus_sink: false
     bus_source: false
@@ -240,7 +240,7 @@ blocks:
     label: Burst Width [Hz]
     short_id: ''
     type: intx
-    value: int(100e3)
+    value: int(75e3)
   states:
     bus_sink: false
     bus_source: false
@@ -444,7 +444,7 @@ blocks:
     label: Max Burst Time [s]
     short_id: ''
     type: eng_float
-    value: '0.8'
+    value: '0.50'
   states:
     bus_sink: false
     bus_source: false
@@ -461,7 +461,7 @@ blocks:
     label: Min Burst Time [s]
     short_id: ''
     type: eng_float
-    value: '0.020'
+    value: '0.010'
   states:
     bus_sink: false
     bus_source: false
@@ -1141,7 +1141,7 @@ blocks:
     affinity: ''
     alias: ''
     comment: ''
-    crcEnable: 'False'
+    crcEnable: 'True'
     crcInitialValue: '0x5FD6'
     maxoutbuf: '0'
     meterMonitorID: '0'

@@ -58,8 +58,7 @@ namespace gr {
     message_port_register_in(PMTCONSTSTR__PDU_IN);
     set_msg_handler(PMTCONSTSTR__PDU_IN,
                     boost::bind(&GridStream_impl::pdu_handler, this, _1));
-    message_port_register_out(PMTCONSTSTR__PDU_OUT);  
-    std::cout << "Entered Constructor\n";  	    
+    message_port_register_out(PMTCONSTSTR__PDU_OUT);      
 	}
 
     /*
@@ -110,7 +109,6 @@ namespace gr {
     {
 		pmt::pmt_t meta = pmt::car(pdu);
 		pmt::pmt_t v_data = pmt::cdr(pdu);
-		std::cout << "Entered Block\n";
 		// make sure PDU data is formed properly
 		if (!(pmt::is_pair(pdu))) {
 			GR_LOG_WARN(d_logger, "received unexpected PMT (non-pair)");
@@ -131,20 +129,19 @@ namespace gr {
 		// Packet not large enough, probably noise
 		if (data.size() < 9)
 			return;				
+		
 		// Read 10/11 bits for Gridstream 4/5 designator
 		// Gridstream 4 = 0111111111
 		// Gridstream 5 = 11111111111
 		long offset = 0;
-		if (data[0]) {
+		if (data[0])		//G5 Packet
 			offset = 11;
-			std::cout << "G5\n";
-		}
-		else {
+		else 
 			offset = 10;
-			std::cout << "G4\n";
-		}
+			
 		// Read header and packet length [2A,55,xx,xx]
 		uint8_t byte = 0;
+		offset += 1; 	// Skip Start bit
 		for (int ii=0; ii<4; ii++) {
 			for (int jj = 0; jj < 8; jj++) {
 				// START MSB FIRST PROCESSING
@@ -208,7 +205,7 @@ namespace gr {
 	    ((packet_type == d_packetTypeFilter) || (d_packetTypeFilter == 0)) ) 
 	    {
 			std::cout << std::setfill('0') << std::hex << std::setw(2) << std::uppercase;
-			for (int i = 0; i < packet_len+4+2; i++) // +4 to capture leading bytes and -2 to strip off CRC -1 to strip off end of packet
+			for (int i = 0; i < packet_len+4; i++) // +4 to capture leading bytes 
 			{
 				std::cout << std::setw(2) << int(out[i]);
 			}
