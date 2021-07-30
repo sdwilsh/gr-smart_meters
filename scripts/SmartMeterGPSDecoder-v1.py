@@ -4,7 +4,6 @@
 # Dumps data to console, copy and paste to a file and save as .csv
 #
 import socket, select, string, sys, binascii, struct, time
-#import numpy as np
 
 def decodeGPS(encodedData):
 	latMultiplier = (float(2**20)/90)
@@ -64,15 +63,15 @@ if __name__ == "__main__":
 				else :
 					#print("The original string is : " + str(sdrData))
 					#Do nothing for the Non-GPS data
-					if ((binascii.hexlify(bytearray(sdrData[3])) == "55") and (binascii.hexlify(bytearray(sdrData[13])) == "fe")) : #Non-GPS Routed Data
-						upTime = int(binascii.hexlify(bytearray(sdrData[20:24])),16)
-						meterID = bytearray(sdrData[26:30])
+					if ((binascii.hexlify(bytearray(sdrData[1])) == "55") and (binascii.hexlify(bytearray(sdrData[11])) == "fe")) : #Non-GPS Routed Data
+						upTime = int(binascii.hexlify(bytearray(sdrData[18:22])),16)
+						meterID = bytearray(sdrData[24:28])
 						#print (binascii.hexlify(meterID).upper() + "," + str(upTime) + "," + str(upTime/60/60/24))
 					#Decode GPS data
-					elif (binascii.hexlify(bytearray(sdrData[3])) == "55" and (binascii.hexlify(bytearray(sdrData[13])) != "fe")) : #GPS Routed Data
-						GPS_Lat, GPS_Lon, Color = decodeGPS(sdrData[13:19])
-						upTime = int(binascii.hexlify(bytearray(sdrData[20:24])),16)
-						meterID = bytearray(sdrData[26:30])
+					elif (binascii.hexlify(bytearray(sdrData[1])) == "55" and (binascii.hexlify(bytearray(sdrData[11])) != "fe")) : #GPS Routed Data
+						GPS_Lat, GPS_Lon, Color = decodeGPS(sdrData[11:17])
+						upTime = int(binascii.hexlify(bytearray(sdrData[18:22])),16)
+						meterID = bytearray(sdrData[24:28])
 						epoch = time.time()
 						formatted_time = "{:.6f}".format(epoch)						
 						print (binascii.hexlify(meterID).upper() + "," + str(upTime) + "," + str(upTime/60/60/24) + "," + str(round(GPS_Lat,6)) + "," + str(round(GPS_Lon,6))) + "," + str(formatted_time)

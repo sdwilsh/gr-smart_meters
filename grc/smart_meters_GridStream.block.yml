@@ -4,7 +4,7 @@ category: '[smart_meters]'
 
 templates:
   imports: import smart_meters
-  make: smart_meters.GridStream(${crcEnable}, ${crcInitialValue}, ${meterMonitorID}, ${packetTypeFilter}, ${packetLengthFilter})
+  make: smart_meters.GridStream(${crcEnable}, ${freqEnable}, ${timestampEnable}, ${crcInitialValue}, ${meterMonitorID}, ${packetTypeFilter}, ${packetLengthFilter})
 
 #  Make one 'parameters' list entry for every parameter you want settable from the GUI.
 #     Keys include:
@@ -14,6 +14,14 @@ templates:
 parameters:
 - id: crcEnable
   label: CRC Enable
+  dtype: enum
+  options: ['True', 'False']
+- id: freqEnable
+  label: Frequency Debug Enable
+  dtype: enum
+  options: ['True', 'False']
+- id: timestampEnable
+  label: Timestamp Enable
   dtype: enum
   options: ['True', 'False']
 - id: crcInitialValue

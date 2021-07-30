@@ -31,6 +31,8 @@ namespace gr {
     {
      private:
 		bool d_crcEnable;
+		bool d_freqEnable;
+		bool d_timestampEnable;
 		uint16_t d_crcInitialValue;
 		uint32_t d_meterMonitorID;
 		uint8_t d_packetTypeFilter;
@@ -41,7 +43,7 @@ namespace gr {
      // int calculate_output_stream_length(const gr_vector_int &ninput_items);
 
      public:
-      GridStream_impl(bool crcEnable, uint16_t crcInitialValue, uint32_t meterMonitorID, uint8_t packetTypeFilter, uint16_t packetLengthFilter);
+      GridStream_impl(bool crcEnable, bool freqEnable, bool timestampEnable, uint16_t crcInitialValue, uint32_t meterMonitorID, uint8_t packetTypeFilter, uint16_t packetLengthFilter);
       ~GridStream_impl();
 
       // Where all the action really happens

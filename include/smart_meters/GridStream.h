@@ -45,7 +45,7 @@ namespace gr {
        * class. smart_meters::GridStream::make is the public interface for
        * creating new instances.
        */
-      static sptr make(bool crcEnable, uint16_t crcInitialValue, uint32_t meterMonitorID, uint8_t packetTypeFilter, uint16_t packetLengthFilter);
+      static sptr make(bool crcEnable, bool freqEnable, bool timestampEnable, uint16_t crcInitialValue, uint32_t meterMonitorID, uint8_t packetTypeFilter, uint16_t packetLengthFilter);
     };
 
   } // namespace smart_meters
